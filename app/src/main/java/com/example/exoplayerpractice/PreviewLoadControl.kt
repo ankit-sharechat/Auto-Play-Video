@@ -3,19 +3,15 @@ package com.example.exoplayerpractice
 import androidx.media3.common.C
 import androidx.media3.common.C.TrackType
 import androidx.media3.common.TrackGroupArray
-import androidx.media3.common.util.Assertions
-import androidx.media3.common.util.Log
-import androidx.media3.common.util.Util
-import androidx.media3.exoplayer.DefaultLoadControl.*
 import androidx.media3.exoplayer.LoadControl
 import androidx.media3.exoplayer.Renderer
 import androidx.media3.exoplayer.trackselection.ExoTrackSelection
 import androidx.media3.exoplayer.upstream.Allocator
 import androidx.media3.exoplayer.upstream.DefaultAllocator
 
-class PreviewLoadControl constructor(
-    var minBufferMs: Int = DEFAULT_MIN_BUFFER_MS,
-    var maxBufferMs: Int = DEFAULT_MAX_BUFFER_MS
+open class PreviewLoadControl constructor(
+    private var minBufferMs: Int = DEFAULT_MIN_BUFFER_MS,
+    private var maxBufferMs: Int = DEFAULT_MAX_BUFFER_MS
 ) : LoadControl {
 
     companion object {
@@ -61,12 +57,7 @@ class PreviewLoadControl constructor(
     }
 
     private var allocator: DefaultAllocator? = null
-    private var minBufferUs: Long = 0
-    private var maxBufferUs: Long = 0
-    private var bufferForPlaybackUs: Long = 0
-    private var bufferForPlaybackAfterRebufferUs: Long = 0
     private var targetBufferBytesOverwrite = 0
-    private val prioritizeTimeOverSizeThresholds = false
     private var backBufferDurationUs: Long = 0
     private var retainBackBufferFromKeyframe = false
     private var targetBufferBytes = 0
@@ -117,29 +108,10 @@ class PreviewLoadControl constructor(
     override fun shouldContinueLoading(
         playbackPositionUs: Long, bufferedDurationUs: Long, playbackSpeed: Float
     ): Boolean {
-        val targetBufferSizeReached = allocator!!.totalBytesAllocated >= targetBufferBytes
-        var minBufferUs = minBufferUs
-        if (playbackSpeed > 1) {
-            // The playback speed is faster than real time, so scale up the minimum required media
-            // duration to keep enough media buffered for a playout duration of minBufferUs.
-            val mediaDurationMinBufferUs =
-                Util.getMediaDurationForPlayoutDuration(minBufferUs, playbackSpeed)
-            minBufferUs = Math.min(mediaDurationMinBufferUs, maxBufferUs)
-        }
-        // Prevent playback from getting stuck if minBufferUs is too small.
-        minBufferUs = Math.max(minBufferUs, 500000)
-        if (bufferedDurationUs < minBufferUs) {
-            isLoading = prioritizeTimeOverSizeThresholds || !targetBufferSizeReached
-            if (!isLoading && bufferedDurationUs < 500000) {
-                Log.w(
-                    "PreviewLoadControl",
-                    "Target buffer size reached with less than 500ms of buffered media data."
-                )
-            }
-        } else if (bufferedDurationUs >= maxBufferUs || targetBufferSizeReached) {
-            isLoading = false
-        } // Else don't change the loading state.
-        return isLoading
+        //Should only buffer until we are not buffered minBufferMs AND playback is not started.
+        //We don`t want to buffer once the playback has started. Since we start playback once min buffer is reached,
+        //it will never stuck in mid-playback
+        return 1000 * minBufferMs >= bufferedDurationUs && playbackPositionUs == 0L
     }
 
     override fun shouldStartPlayback(
@@ -148,16 +120,8 @@ class PreviewLoadControl constructor(
         rebuffering: Boolean,
         targetLiveOffsetUs: Long
     ): Boolean {
-        var bufferedDurationUs = bufferedDurationUs
-        bufferedDurationUs =
-            Util.getPlayoutDurationForMediaDuration(bufferedDurationUs, playbackSpeed)
-        var minBufferDurationUs =
-            if (rebuffering) bufferForPlaybackAfterRebufferUs else bufferForPlaybackUs
-        if (targetLiveOffsetUs != C.TIME_UNSET) {
-            minBufferDurationUs = Math.min(targetLiveOffsetUs / 2, minBufferDurationUs)
-        }
-        return minBufferDurationUs <= 0 || bufferedDurationUs >= minBufferDurationUs || (!prioritizeTimeOverSizeThresholds
-                && allocator!!.totalBytesAllocated >= targetBufferBytes)
+        //Should only play after buffer ends
+        return bufferedDurationUs >= minBufferMs * 1000
     }
 
     /**
@@ -168,7 +132,7 @@ class PreviewLoadControl constructor(
      * @param trackSelectionArray The selected tracks.
      * @return The target buffer size in bytes.
      */
-    protected fun calculateTargetBufferBytes(
+    private fun calculateTargetBufferBytes(
         renderers: Array<Renderer>,
         trackSelectionArray: Array<ExoTrackSelection>
     ): Int {
