@@ -45,14 +45,13 @@ class MainActivity : AppCompatActivity(), Player.Listener {
     private fun initializePlayer() {
         initial = System.currentTimeMillis()
         player = ExoPlayer.Builder(this)
-            .setLoadControl(PreviewLoadControl())
+            .setLoadControl(PreviewLoadControl(maxBufferMs = 30000))
             .build()
             .also { exoPlayer ->
                 viewBinding.playerView.player = exoPlayer
                 viewBinding.playerView.useController = false
-                exoPlayer.setMediaItem(MediaItem.fromUri(videos[0]))
-                exoPlayer.playWhenReady = false
-                exoPlayer?.volume = 0f
+                exoPlayer.setMediaItem(MediaItem.fromUri(videos[4]))
+                exoPlayer.playWhenReady = true
                 exoPlayer.prepare()
             }
 
@@ -73,17 +72,13 @@ class MainActivity : AppCompatActivity(), Player.Listener {
         }, 100)
     }
 
-    val bufferData = ArrayList<Pair<Long, Long>>()
-
     private fun readStats() {
         val totalBufferedDuration = player?.totalBufferedDuration
         val plaback = player?.currentPosition
         val duration = player?.duration
-        viewBinding.contentDuration.text = stringForTime(duration!!)
-        viewBinding.bufferingDuration.text = """
-            Playback At: $plaback
-            Total Buffered : $totalBufferedDuration 
-        """.trimIndent()
+        viewBinding.contentDuration.text =
+            stringForTime(plaback!!) + "/" + stringForTime(duration!!)
+        viewBinding.bufferingDuration.text = stringForTime(totalBufferedDuration!!)
     }
 
     private fun setBufferingPercent() {
