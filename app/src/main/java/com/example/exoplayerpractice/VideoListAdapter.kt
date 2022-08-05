@@ -5,27 +5,35 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import com.example.exoplayerpractice.databinding.ItemVideoBinding
 
-class VideoListAdapter(private val videosList: List<String>) :
+class VideoListAdapter(
+    private val placeholders: List<String>,
+    private val videosList: List<String>
+) :
     RecyclerView.Adapter<VideoListAdapter.VideoItemItemViewHolder>() {
 
     class VideoItemItemViewHolder(private val itemBinding: ItemVideoBinding) :
         RecyclerView.ViewHolder(itemBinding.root) {
         private var videoUrl = ""
-        fun bind(videoUrl: String) {
+        fun bind(placeholder: String, videoUrl: String) {
             this.videoUrl = videoUrl
+            itemBinding.placeholderView.load(placeholder)
             itemBinding.root.clipToOutline = true
             itemBinding.playerView.useController = false
         }
 
         fun pausePlayer() {
             itemBinding.playerView.player = null
+            itemBinding.placeholderView.visibility = View.VISIBLE
             itemBinding.playerView.player?.playWhenReady = false
         }
 
         fun startPlay() {
-            itemBinding.playerView.player = ExoplayerManager.getExoPlayerInstance(itemBinding.root.context, videoUrl)
+            itemBinding.placeholderView.visibility = View.INVISIBLE
+            itemBinding.playerView.player =
+                ExoplayerManager.getExoPlayerInstance(itemBinding.root.context, videoUrl)
             itemBinding.playerView.player?.playWhenReady = true
         }
     }
@@ -36,7 +44,7 @@ class VideoListAdapter(private val videosList: List<String>) :
     }
 
     override fun onBindViewHolder(holder: VideoItemItemViewHolder, position: Int) {
-        holder.bind(videosList[position])
+        holder.bind(placeholders[position], videosList[position])
     }
 
     override fun onBindViewHolder(

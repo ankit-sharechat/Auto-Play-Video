@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity(), Player.Listener {
 
     private lateinit var videoListAdapter: VideoListAdapter
     private fun setupRecyclerView() {
-        videoListAdapter = VideoListAdapter(videos)
+        videoListAdapter = VideoListAdapter(placeholders, videos)
         viewBinding.recyclerView.apply {
             layoutManager =
                 LinearLayoutManager(this@MainActivity, LinearLayoutManager.HORIZONTAL, false)
