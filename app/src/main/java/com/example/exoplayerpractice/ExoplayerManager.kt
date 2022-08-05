@@ -15,7 +15,6 @@ object ExoplayerManager : Player.Listener {
     private var defaultMediaSourceFactory: DefaultMediaSourceFactory? = null
     fun getExoPlayerInstance(context: Context, videoUrl: String): ExoPlayer {
         if (player == null) {
-            Log.d("ExoplayerManager","creating instance")
             defaultMediaSourceFactory = DefaultMediaSourceFactory(CacheDataSourceFactory(context))
             player = ExoPlayer.Builder(context)
                 .setLoadControl(PreviewLoadControl(maxBufferMs = MAX_BUFFER_MS))
