@@ -13,12 +13,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintDimensionRatio="9:16"
-        android:layout_width="240dp"
+        android:layout_width="140dp"
         android:layout_height="0dp"/>
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/contentDuration"
-        app:layout_constraintEnd_toEndOf="@+id/playerView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/bufferingDuration"
         app:layout_constraintTop_toBottomOf="@+id/playerView"
         android:layout_marginTop="4dp"
         android:layout_width="wrap_content"
@@ -26,10 +27,14 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/bufferingDuration"
-        app:layout_constraintStart_toStartOf="@+id/playerView"
+        android:layout_marginEnd="40dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintEnd_toStartOf="@+id/contentDuration"
         app:layout_constraintTop_toBottomOf="@+id/playerView"
         android:layout_marginTop="4dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
