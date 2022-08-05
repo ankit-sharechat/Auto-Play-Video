@@ -2,9 +2,8 @@ package com.example.exoplayerpractice
 
 import androidx.media3.exoplayer.DefaultLoadControl
 
-open class PreviewLoadControl constructor(
-    private var maxBufferMs: Int = DEFAULT_MAX_BUFFER_MS
-) : DefaultLoadControl() {
+open class PreviewLoadControl constructor(private var maxBufferMs: Int = DEFAULT_MAX_BUFFER_MS) :
+    DefaultLoadControl() {
     override fun shouldContinueLoading(
         playbackPositionUs: Long,
         bufferedDurationUs: Long,

@@ -33,7 +33,9 @@ class VideoListAdapter(
         fun startPlay() {
             itemBinding.placeholderView.visibility = View.INVISIBLE
             itemBinding.playerView.player =
-                ExoplayerManager.getExoPlayerInstance(itemBinding.root.context, videoUrl)
+                ExoplayerManager.getExoPlayerInstance(
+                    itemBinding.root.context,
+                    videoUrl)
             itemBinding.playerView.player?.playWhenReady = true
         }
     }

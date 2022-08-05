@@ -3,7 +3,7 @@ package com.example.exoplayerpractice
 import java.util.*
 
 object Util {
-    fun stringForTime(timeMs: Long): String? {
+    fun stringForTime(timeMs: Long): String {
         val mFormatBuilder = StringBuilder()
         val mFormatter = Formatter(mFormatBuilder, Locale.getDefault())
         val totalSeconds = timeMs / 1000
