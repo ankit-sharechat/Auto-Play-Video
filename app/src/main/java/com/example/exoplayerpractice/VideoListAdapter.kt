@@ -86,7 +86,6 @@ class RecyclerViewMargin : RecyclerView.ItemDecoration() {
         outRect: Rect, view: View,
         parent: RecyclerView, state: RecyclerView.State
     ) {
-        val position = parent.getChildLayoutPosition(view)
         //set right margin to all
         outRect.left = 40
     }
