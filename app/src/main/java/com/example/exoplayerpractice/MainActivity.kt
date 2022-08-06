@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity(), Player.Listener {
 }
 
 fun RecyclerView.attachPreviewManager(videoPreviewManager: VideoPreviewManager) {
-    videoPreviewManager.attachToRecyclerView(recyclerView = this)
+    videoPreviewManager.attachToRecyclerView(recyclerView = this, previewRepeatMode = VideoPreviewManager.PreviewRepeatMode.Restart)
 }
 
 fun RecyclerView.withInterItemSpace(spaceDp: Int) {

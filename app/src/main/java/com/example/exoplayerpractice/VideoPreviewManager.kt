@@ -91,7 +91,6 @@ class VideoPreviewManager {
             }
             withContext(Dispatchers.Main) {
                 this@VideoPreviewManager.recyclerView.post {
-                    Log.d("VideoPreviewmanager","playing $itemIndex | ${videoPreviewQueue.toList()}")
                     listener?.play(itemIndex)
                 }
             }
