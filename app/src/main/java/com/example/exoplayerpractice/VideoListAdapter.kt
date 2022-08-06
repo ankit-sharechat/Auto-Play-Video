@@ -75,7 +75,7 @@ class VideoListAdapter(
 
     private val PLAY = 1
     private val PAUSE = 0
-    var lastPlay = -1
+    private var lastPlay = -1
     override fun play(index: Int) {
         if (lastPlay != -1) {
             notifyItemChanged(lastPlay, PAUSE)
