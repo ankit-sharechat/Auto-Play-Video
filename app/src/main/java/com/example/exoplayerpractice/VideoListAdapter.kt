@@ -34,8 +34,10 @@ class VideoListAdapter(
             itemBinding.placeholderView.visibility = View.INVISIBLE
             itemBinding.playerView.player =
                 ExoplayerManager.getExoPlayerInstance(
-                    itemBinding.root.context,
-                    videoUrl)
+                    context = itemBinding.root.context,
+                    itemIndex = bindingAdapterPosition,
+                    videoUrl = videoUrl
+                )
             itemBinding.playerView.player?.playWhenReady = true
         }
     }

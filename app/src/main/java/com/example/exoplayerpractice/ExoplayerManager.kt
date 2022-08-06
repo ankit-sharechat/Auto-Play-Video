@@ -5,19 +5,26 @@ import android.os.Handler
 import android.os.Looper
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.Player.STATE_ENDED
 import androidx.media3.common.Player.STATE_READY
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 object ExoplayerManager : Player.Listener {
     private val MAX_BUFFER_MS = 4000
-
     private var player: ExoPlayer? = null
+    private var itemIndex: Int = -1
     private var defaultMediaSourceFactory: DefaultMediaSourceFactory? = null
+
     fun getExoPlayerInstance(
         context: Context,
+        itemIndex: Int,
         videoUrl: String
     ): ExoPlayer {
+        this.itemIndex = itemIndex
         if (player == null) {
             defaultMediaSourceFactory = DefaultMediaSourceFactory(CacheDataSourceFactory(context))
             player = ExoPlayer.Builder(context)
@@ -42,30 +49,43 @@ object ExoplayerManager : Player.Listener {
 
     override fun onPlaybackStateChanged(playbackState: Int) {
         super.onPlaybackStateChanged(playbackState)
-        if (playbackState == Player.STATE_BUFFERING || playbackState == Player.STATE_IDLE || playbackState == Player.STATE_ENDED) {
-            restartPlayer()
-        }
         if (playbackState == STATE_READY) {
+            onStarted()
             startReadingUpdates()
         }
     }
 
-    private val handler = Handler(Looper.getMainLooper())
+    private fun onStarted() {
+        _playCompletionFlow.tryEmit(PlayStatus.STARTED(itemIndex))
+    }
+
+    private fun onEnded() {
+        _playCompletionFlow.tryEmit(PlayStatus.ENDED(itemIndex))
+    }
+
     private fun startReadingUpdates() {
         handler.postDelayed({ readPlayerUpdates() }, 300)
     }
 
     private fun readPlayerUpdates() {
-        val plabackPosition = player?.currentPosition ?: 0L
-        if (plabackPosition >= MAX_BUFFER_MS) {
-            restartPlayer()
+        if ((player?.currentPosition ?: 0L) >= MAX_BUFFER_MS
+            || player?.playbackState == STATE_ENDED
+        ) {
+            player?.playWhenReady = false
+            onEnded()
+        } else {
+            startReadingUpdates()
         }
-        startReadingUpdates()
     }
 
-
-    private fun restartPlayer() {
-        player?.seekTo(0L)
-        player?.playWhenReady = true
+    sealed class PlayStatus {
+        data class STARTED(val itemIndex: Int) : PlayStatus()
+        data class ENDED(val itemIndex: Int) : PlayStatus()
     }
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val _playCompletionFlow: MutableSharedFlow<PlayStatus> =
+        MutableSharedFlow(1, 1, BufferOverflow.DROP_OLDEST)
+    val playCompletionFlow: SharedFlow<PlayStatus>
+        get() = _playCompletionFlow
 }

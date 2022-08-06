@@ -35,11 +35,15 @@ class MainActivity : AppCompatActivity(), Player.Listener {
             viewBinding.recyclerView,
             object : VideoPreviewManager.VideoPreviewListener {
                 override fun play(index: Int) {
-                    videoListAdapter.playPreviewAt(index)
+                    viewBinding.recyclerView.post {
+                        videoListAdapter.playPreviewAt(index)
+                    }
                 }
 
                 override fun pauseAll() {
-                    videoListAdapter.pauseAllPreviews()
+                    viewBinding.recyclerView.post {
+                        videoListAdapter.pauseAllPreviews()
+                    }
                 }
             })
     }
