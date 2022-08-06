@@ -6,7 +6,6 @@
     android:layout_height="wrap_content"
     android:clipChildren="true"
     android:animateLayoutChanges="true"
-    android:background="@drawable/bg_rec_4"
     tools:context=".MainActivity">
 
     <androidx.media3.ui.PlayerView
