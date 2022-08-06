@@ -1,5 +1,6 @@
 package com.example.exoplayerpractice
 
+import android.util.Log
 import android.util.Range
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,8 +15,14 @@ class VideoPreviewManager {
     private val videoPreviewQueue: Queue<Int> = LinkedList()
     private lateinit var recyclerView: RecyclerView
     private var listener: VideoPreviewListener? = null
-    fun attachToRecyclerView(recyclerView: RecyclerView) {
+    private var previewRepeatMode: PreviewRepeatMode = PreviewRepeatMode.Single
+
+    fun attachToRecyclerView(
+        recyclerView: RecyclerView,
+        previewRepeatMode: PreviewRepeatMode = PreviewRepeatMode.Single
+    ) {
         this.recyclerView = recyclerView
+        this.previewRepeatMode = previewRepeatMode
         this.listener = this.recyclerView.adapter as? VideoPreviewListener
         attachScrollListener()
         collectPlayCompletions()
@@ -79,8 +86,12 @@ class VideoPreviewManager {
 
     private suspend fun playNext() {
         videoPreviewQueue.poll()?.let { itemIndex ->
+            if (previewRepeatMode == PreviewRepeatMode.Restart) {
+                videoPreviewQueue.add(itemIndex)
+            }
             withContext(Dispatchers.Main) {
                 this@VideoPreviewManager.recyclerView.post {
+                    Log.d("VideoPreviewmanager","playing $itemIndex | ${videoPreviewQueue.toList()}")
                     listener?.play(itemIndex)
                 }
             }
@@ -116,5 +127,10 @@ class VideoPreviewManager {
     interface VideoPreviewListener {
         fun play(index: Int)
         fun pauseAll()
+    }
+
+    sealed class PreviewRepeatMode {
+        object Single : PreviewRepeatMode()
+        object Restart : PreviewRepeatMode()
     }
 }

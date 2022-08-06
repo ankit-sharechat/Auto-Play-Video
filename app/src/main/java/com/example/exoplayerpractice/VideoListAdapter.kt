@@ -1,6 +1,7 @@
 package com.example.exoplayerpractice
 
 import android.graphics.Rect
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,6 +33,7 @@ class VideoListAdapter(
         }
 
         fun startPlay() {
+            Log.d("VideoPreviewmanager","playing $videoUrl | $bindingAdapterPosition | $absoluteAdapterPosition | ${itemBinding.playerView}")
             itemBinding.placeholderView.visibility = View.INVISIBLE
             itemBinding.playerView.player =
                 ExoplayerManager.getExoPlayerInstance(
