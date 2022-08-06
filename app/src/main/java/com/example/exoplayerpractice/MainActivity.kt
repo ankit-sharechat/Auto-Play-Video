@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity(), Player.Listener {
         videoListAdapter = VideoListAdapter(placeholders, videos)
         val videoPreviewManager = VideoPreviewManager()
         viewBinding.recyclerView.apply {
+            this.adapter = videoListAdapter
             asHorizontalLinearLayout()
             withInterItemSpace(8)
             attachPreviewManager(videoPreviewManager)
