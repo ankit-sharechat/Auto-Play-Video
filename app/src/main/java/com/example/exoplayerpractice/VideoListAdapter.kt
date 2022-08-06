@@ -82,12 +82,12 @@ class VideoListAdapter(
     }
 }
 
-class RecyclerViewMargin : RecyclerView.ItemDecoration() {
+class RecyclerViewMargin(private val spaceDp: Int) : RecyclerView.ItemDecoration() {
     override fun getItemOffsets(
         outRect: Rect, view: View,
         parent: RecyclerView, state: RecyclerView.State
     ) {
         //set right margin to all
-        outRect.left = 40
+        outRect.left = spaceDp * parent.context.resources.displayMetrics.density.toInt()
     }
 }

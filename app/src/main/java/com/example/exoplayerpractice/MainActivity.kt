@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.Player
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.exoplayerpractice.databinding.ActivityMainBinding
 
 
@@ -23,14 +24,23 @@ class MainActivity : AppCompatActivity(), Player.Listener {
     private lateinit var videoListAdapter: VideoListAdapter
     private fun setupRecyclerView() {
         videoListAdapter = VideoListAdapter(placeholders, videos)
+        val videoPreviewManager = VideoPreviewManager()
         viewBinding.recyclerView.apply {
-            layoutManager =
-                LinearLayoutManager(this@MainActivity, LinearLayoutManager.HORIZONTAL, false)
-            this.adapter = videoListAdapter
-            addItemDecoration(RecyclerViewMargin())
+            asHorizontalLinearLayout()
+            withInterItemSpace(8)
+            attachPreviewManager(videoPreviewManager)
         }
-
-        val videoPreview = VideoPreviewManager()
-        videoPreview.attachToRecyclerView(viewBinding.recyclerView)
     }
+}
+
+fun RecyclerView.attachPreviewManager(videoPreviewManager: VideoPreviewManager) {
+    videoPreviewManager.attachToRecyclerView(recyclerView = this)
+}
+
+fun RecyclerView.withInterItemSpace(spaceDp: Int) {
+    addItemDecoration(RecyclerViewMargin(spaceDp))
+}
+
+fun RecyclerView.asHorizontalLinearLayout() {
+    layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 }
