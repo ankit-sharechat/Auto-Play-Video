@@ -1,6 +1,5 @@
 package com.example.exoplayerpractice
 
-import android.util.Log
 import android.util.Range
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -70,7 +69,6 @@ class VideoPreviewManager {
                 firstIndex = findFirstCompletelyVisibleItemPosition()
                 lastIndex = findLastCompletelyVisibleItemPosition()
             }
-        Log.d("VideoPreviewManagerDebug", "[$firstIndex,$lastIndex]")
         return Range(firstIndex, lastIndex)
     }
 
@@ -80,9 +78,7 @@ class VideoPreviewManager {
     }
 
     private suspend fun playNext() {
-        Log.d("VideoPreviewManagerDebug", "Attempt to Play From Queue")
         videoPreviewQueue.poll()?.let { itemIndex ->
-            Log.d("VideoPreviewManagerDebug", "Playing $itemIndex From Queue")
             withContext(Dispatchers.Main) {
                 this@VideoPreviewManager.recyclerView.post {
                     listener?.play(itemIndex)
@@ -111,7 +107,6 @@ class VideoPreviewManager {
 
     private suspend fun stopPlayer() {
         withContext(Dispatchers.Main) {
-            Log.d("VideoPreviewManagerDebug", "Stopping Preview")
             this@VideoPreviewManager.recyclerView.post {
                 listener?.pauseAll()
             }
