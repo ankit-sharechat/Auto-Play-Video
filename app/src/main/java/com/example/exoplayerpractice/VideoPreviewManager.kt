@@ -14,10 +14,10 @@ class VideoPreviewManager {
     private val scope = CoroutineScope(Job() + Dispatchers.Default)
     private val videoPreviewQueue: Queue<Int> = LinkedList()
     private lateinit var recyclerView: RecyclerView
-    private lateinit var listener: VideoPreviewListener
-    fun attachRecyclerView(recyclerView: RecyclerView, listener: VideoPreviewListener) {
+    private var listener: VideoPreviewListener? = null
+    fun attachToRecyclerView(recyclerView: RecyclerView) {
         this.recyclerView = recyclerView
-        this.listener = listener
+        this.listener = this.recyclerView.adapter as? VideoPreviewListener
         attachScrollListener()
         collectPlayCompletions()
     }
@@ -84,7 +84,9 @@ class VideoPreviewManager {
         videoPreviewQueue.poll()?.let { itemIndex ->
             Log.d("VideoPreviewManagerDebug", "Playing $itemIndex From Queue")
             withContext(Dispatchers.Main) {
-                listener.play(itemIndex)
+                this@VideoPreviewManager.recyclerView.post {
+                    listener?.play(itemIndex)
+                }
             }
         }
     }
@@ -110,7 +112,9 @@ class VideoPreviewManager {
     private suspend fun stopPlayer() {
         withContext(Dispatchers.Main) {
             Log.d("VideoPreviewManagerDebug", "Stopping Preview")
-            listener.pauseAll()
+            this@VideoPreviewManager.recyclerView.post {
+                listener?.pauseAll()
+            }
         }
     }
 

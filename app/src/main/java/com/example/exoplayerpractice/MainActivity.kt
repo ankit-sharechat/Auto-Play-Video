@@ -31,20 +31,6 @@ class MainActivity : AppCompatActivity(), Player.Listener {
         }
 
         val videoPreview = VideoPreviewManager()
-        videoPreview.attachRecyclerView(
-            viewBinding.recyclerView,
-            object : VideoPreviewManager.VideoPreviewListener {
-                override fun play(index: Int) {
-                    viewBinding.recyclerView.post {
-                        videoListAdapter.playPreviewAt(index)
-                    }
-                }
-
-                override fun pauseAll() {
-                    viewBinding.recyclerView.post {
-                        videoListAdapter.pauseAllPreviews()
-                    }
-                }
-            })
+        videoPreview.attachToRecyclerView(viewBinding.recyclerView)
     }
 }

@@ -12,7 +12,8 @@ class VideoListAdapter(
     private val placeholders: List<String>,
     private val videosList: List<String>
 ) :
-    RecyclerView.Adapter<VideoListAdapter.VideoItemItemViewHolder>() {
+    RecyclerView.Adapter<VideoListAdapter.VideoItemItemViewHolder>(),
+    VideoPreviewManager.VideoPreviewListener {
 
     class VideoItemItemViewHolder(private val itemBinding: ItemVideoBinding) :
         RecyclerView.ViewHolder(itemBinding.root) {
@@ -70,18 +71,16 @@ class VideoListAdapter(
         return videosList.size
     }
 
-    fun pauseAllPreviews() {
-        notifyItemRangeChanged(0, videosList.size, PAUSE)
-    }
-
-    fun playPreviewAt(index: Int) {
+    private val PLAY = 1
+    private val PAUSE = 0
+    override fun play(index: Int) {
         notifyItemChanged(index, PLAY)
     }
 
-    private val PLAY = 1
-    private val PAUSE = 0
+    override fun pauseAll() {
+        notifyItemRangeChanged(0, videosList.size, PAUSE)
+    }
 }
-
 
 class RecyclerViewMargin : RecyclerView.ItemDecoration() {
     override fun getItemOffsets(
